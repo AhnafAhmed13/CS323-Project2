@@ -9,8 +9,16 @@ public class Main {
       
       DecimalFormat df = new DecimalFormat("00.00");
 
+      long start = System.nanoTime();
       double p = prob();
-      System.out.println("Mets win probability: " +df.format(p*100)+ "%");
+      long end = System.nanoTime();
+      long time = end - start;
+      System.out.println("Mets win probability (memo): " +df.format(p*100)+ "% ["+time+"]");
+      start = System.nanoTime();
+      double pdp = prob2();
+      end = System.nanoTime();
+      time = end - start;
+      System.out.println("Mets win probability (dp): " +df.format(pdp*100)+ "% ["+time+"]");
    }
 
    public static double prob() {
@@ -35,5 +43,19 @@ public class Main {
          memo[i][j] = result;
          return result;
       }
+   }
+   
+   public static double prob2() {
+      double[][] dp = new double[5][5];
+      for (int i = 0; i < 5; i++) {
+         dp[4][i] = 1; // mets win all 4
+         dp[i][4] = 0; // yankees win all 4
+      }
+      for (int i = 3; i >= 0; i--) {
+         for (int j = 3; j >= 0; j--) {
+            dp[i][j] = p1 * dp[i+1][j] + p2 * dp[i][j+1];
+         }
+      }
+      return dp[0][0];
    }
 }
